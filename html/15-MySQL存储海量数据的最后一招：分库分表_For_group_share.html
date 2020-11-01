@@ -1,0 +1,1106 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>15-MySQL存储海量数据的最后一招：分库分表</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+        <style>
+        html {
+            color: #333;
+            -webkit-text-size-adjust: 100%;
+            -ms-text-size-adjust: 100%;
+            text-rendering: optimizelegibility;
+            font-family: Helvetica Neue, PingFang SC, Verdana, Microsoft Yahei, Hiragino Sans GB, Microsoft Sans Serif, WenQuanYi Micro Hei, sans-serif
+        }
+
+        html.borderbox *,
+        html.borderbox :after,
+        html.borderbox :before {
+            box-sizing: border-box
+        }
+
+        article,
+        aside,
+        blockquote,
+        body,
+        button,
+        code,
+        dd,
+        details,
+        dl,
+        dt,
+        fieldset,
+        figcaption,
+        figure,
+        footer,
+        form,
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6,
+        header,
+        hr,
+        input,
+        legend,
+        li,
+        menu,
+        nav,
+        ol,
+        p,
+        pre,
+        section,
+        td,
+        textarea,
+        th,
+        ul {
+            margin: 0;
+            padding: 0
+        }
+
+        article,
+        aside,
+        details,
+        figcaption,
+        figure,
+        footer,
+        header,
+        menu,
+        nav,
+        section {
+            display: block
+        }
+
+        audio,
+        canvas,
+        video {
+            display: inline-block
+        }
+
+        body,
+        button,
+        input,
+        select,
+        textarea {
+            font: 300 1em/1.8 PingFang SC, Lantinghei SC, Microsoft Yahei, Hiragino Sans GB, Microsoft Sans Serif, WenQuanYi Micro Hei, Helvetica, sans-serif
+        }
+
+        button::-moz-focus-inner,
+        input::-moz-focus-inner {
+            padding: 0;
+            border: 0
+        }
+
+        table {
+            border-collapse: collapse;
+            border-spacing: 0
+        }
+
+        fieldset,
+        img {
+            border: 0
+        }
+
+        blockquote {
+            position: relative;
+            color: #999;
+            font-weight: 400;
+            border-left: 1px solid #1abc9c;
+            padding-left: 1em;
+            margin: 1em 3em 1em 2em
+        }
+
+        @media only screen and (max-width: 640px) {
+            blockquote {
+                margin: 1em 0
+            }
+        }
+
+        abbr,
+        acronym {
+            border-bottom: 1px dotted;
+            font-variant: normal
+        }
+
+        abbr {
+            cursor: help
+        }
+
+        del {
+            text-decoration: line-through
+        }
+
+        address,
+        caption,
+        cite,
+        code,
+        dfn,
+        em,
+        th,
+        var {
+            font-style: normal;
+            font-weight: 400
+        }
+
+        ol,
+        ul {
+            list-style: none
+        }
+
+        caption,
+        th {
+            text-align: left
+        }
+
+        q:after,
+        q:before {
+            content: ""
+        }
+
+        sub,
+        sup {
+            font-size: 75%;
+            line-height: 0;
+            position: relative
+        }
+
+        :root sub,
+        :root sup {
+            vertical-align: baseline
+        }
+
+        sup {
+            top: -.5em
+        }
+
+        sub {
+            bottom: -.25em
+        }
+
+        a {
+            color: #1abc9c
+        }
+
+        a:hover {
+            text-decoration: underline
+        }
+
+        .typo a {
+            border-bottom: 1px solid #1abc9c
+        }
+
+        .typo a:hover {
+            border-bottom-color: #555;
+            color: #555
+        }
+
+        .typo a:hover,
+        a,
+        ins {
+            text-decoration: none
+        }
+
+        .typo-u,
+        u {
+            text-decoration: underline
+        }
+
+        mark {
+            background: #fffdd1;
+            border-bottom: 1px solid #ffedce;
+            padding: 2px;
+            margin: 0 5px
+        }
+
+        code,
+        pre,
+        pre tt {
+            font-family: Courier, Courier New, monospace
+        }
+
+        pre {
+            background: hsla(0, 0%, 97%, .7);
+            border: 1px solid #ddd;
+            padding: 1em 1.5em;
+            display: block;
+            -webkit-overflow-scrolling: touch
+        }
+
+        hr {
+            border: none;
+            border-bottom: 1px solid #cfcfcf;
+            margin-bottom: .8em;
+            height: 10px
+        }
+
+        .typo-small,
+        figcaption,
+        small {
+            font-size: .9em;
+            color: #888
+        }
+
+        b,
+        strong {
+            font-weight: 700;
+            color: #000
+        }
+
+        [draggable] {
+            cursor: move
+        }
+
+        .clearfix:after,
+        .clearfix:before {
+            content: "";
+            display: table
+        }
+
+        .clearfix:after {
+            clear: both
+        }
+
+        .clearfix {
+            zoom: 1
+        }
+
+        .textwrap,
+        .textwrap td,
+        .textwrap th {
+            word-wrap: break-word;
+            word-break: break-all
+        }
+
+        .textwrap-table {
+            table-layout: fixed
+        }
+
+        .serif {
+            font-family: Palatino, Optima, Georgia, serif
+        }
+
+        .typo-dl,
+        .typo-form,
+        .typo-hr,
+        .typo-ol,
+        .typo-p,
+        .typo-pre,
+        .typo-table,
+        .typo-ul,
+        .typo dl,
+        .typo form,
+        .typo hr,
+        .typo ol,
+        .typo p,
+        .typo pre,
+        .typo table,
+        .typo ul,
+        blockquote {
+            margin-bottom: 1rem
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            font-family: PingFang SC, Helvetica Neue, Verdana, Microsoft Yahei, Hiragino Sans GB, Microsoft Sans Serif, WenQuanYi Micro Hei, sans-serif;
+            color: #000;
+            line-height: 1.35
+        }
+
+        .typo-h1,
+        .typo-h2,
+        .typo-h3,
+        .typo-h4,
+        .typo-h5,
+        .typo-h6,
+        .typo h1,
+        .typo h2,
+        .typo h3,
+        .typo h4,
+        .typo h5,
+        .typo h6 {
+            margin-top: 1.2em;
+            margin-bottom: .6em;
+            line-height: 1.35
+        }
+
+        .typo-h1,
+        .typo h1 {
+            font-size: 2em
+        }
+
+        .typo-h2,
+        .typo h2 {
+            font-size: 1.8em
+        }
+
+        .typo-h3,
+        .typo h3 {
+            font-size: 1.6em
+        }
+
+        .typo-h4,
+        .typo h4 {
+            font-size: 1.4em
+        }
+
+        .typo-h5,
+        .typo-h6,
+        .typo h5,
+        .typo h6 {
+            font-size: 1.2em
+        }
+
+        .typo-ul,
+        .typo ul {
+            margin-left: 1.3em;
+            list-style: disc
+        }
+
+        .typo-ol,
+        .typo ol {
+            list-style: decimal;
+            margin-left: 1.9em
+        }
+
+        .typo-ol ol,
+        .typo-ol ul,
+        .typo-ul ol,
+        .typo-ul ul,
+        .typo li ol,
+        .typo li ul {
+            margin-bottom: .8em;
+            margin-left: 2em
+        }
+
+        .typo-ol ul,
+        .typo-ul ul,
+        .typo li ul {
+            list-style: circle
+        }
+
+        .typo-table td,
+        .typo-table th,
+        .typo table caption,
+        .typo table td,
+        .typo table th {
+            border: 1px solid #ddd;
+            padding: .5em 1em;
+            color: #666
+        }
+
+        .typo-table th,
+        .typo table th {
+            background: #fbfbfb
+        }
+
+        .typo-table thead th,
+        .typo table thead th {
+            background: hsla(0, 0%, 95%, .7)
+        }
+
+        .typo table caption {
+            border-bottom: none
+        }
+
+        .typo-input,
+        .typo-textarea {
+            -webkit-appearance: none;
+            border-radius: 0
+        }
+
+        .typo-em,
+        .typo em,
+        caption,
+        legend {
+            color: #000;
+            font-weight: inherit
+        }
+
+        .typo-em {
+            position: relative
+        }
+
+        .typo-em:after {
+            position: absolute;
+            top: .65em;
+            left: 0;
+            width: 100%;
+            overflow: hidden;
+            white-space: nowrap;
+            content: "\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB"
+        }
+
+        .typo img {
+            max-width: 100%
+        }
+
+        .common-content {
+            font-weight: 400;
+            color: #353535;
+            line-height: 1.75rem;
+            white-space: normal;
+            word-break: normal;
+            font-size: 1rem
+        }
+
+        .common-content img {
+            display: block;
+            max-width: 100%;
+            background-color: #eee
+        }
+
+        .common-content audio,
+        .common-content video {
+            width: 100%;
+            background-color: #eee
+        }
+
+        .common-content center,
+        .common-content font {
+            margin-top: 1rem;
+            display: inline-block
+        }
+
+        .common-content center {
+            width: 100%
+        }
+
+        .common-content pre {
+            margin-top: 1rem;
+            padding-left: 0;
+            padding-right: 0;
+            position: relative;
+            overflow: hidden
+        }
+
+        .common-content pre code {
+            font-size: .8rem;
+            font-family: Consolas, Liberation Mono, Menlo, monospace, Courier;
+            display: block;
+            width: 100%;
+            box-sizing: border-box;
+            padding-left: 1rem;
+            padding-right: 1rem;
+            overflow-x: auto
+        }
+
+        .common-content hr {
+            border: none;
+            margin-top: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-top: 1px solid #f5f5f5;
+            height: 1px;
+            background: none
+        }
+
+        .common-content b,
+        .common-content h1,
+        .common-content h2,
+        .common-content h3,
+        .common-content h4,
+        .common-content h5,
+        .common-content strong {
+            font-weight: 700
+        }
+
+        .common-content h1,
+        .common-content h2 {
+            font-size: 1.125rem;
+            margin-bottom: .45rem
+        }
+
+        .common-content h3,
+        .common-content h4,
+        .common-content h5 {
+            font-size: 1rem;
+            margin-bottom: .45rem
+        }
+
+        .common-content p {
+            font-weight: 400;
+            color: #353535;
+            margin-top: .15rem
+        }
+
+        .common-content .orange {
+            color: #ff5a05
+        }
+
+        .common-content .reference {
+            font-size: 1rem;
+            color: #888
+        }
+
+        .custom-rich-content h1 {
+            margin-top: 0;
+            font-weight: 400;
+            font-size: 15.25px;
+            border-bottom: 1px solid #eee;
+            line-height: 2.8
+        }
+
+        .custom-rich-content li,
+        .custom-rich-content p {
+            font-size: 14px;
+            color: #888;
+            line-height: 1.6
+        }
+
+        table.hljs-ln {
+            margin-bottom: 0;
+            border-spacing: 0;
+            border-collapse: collapse
+        }
+
+        table.hljs-ln,
+        table.hljs-ln tbody,
+        table.hljs-ln td,
+        table.hljs-ln tr {
+            box-sizing: border-box
+        }
+
+        table.hljs-ln td {
+            padding: 0;
+            border: 0
+        }
+
+        table.hljs-ln td.hljs-ln-numbers {
+            min-width: 15px;
+            color: rgba(27, 31, 35, .3);
+            text-align: right;
+            white-space: nowrap;
+            cursor: pointer;
+            user-select: none
+        }
+
+        table.hljs-ln td.hljs-ln-code,
+        table.hljs-ln td.hljs-ln-numbers {
+            font-family: SFMono-Regular, Consolas, Liberation Mono, Menlo, Courier, monospace;
+            font-size: 12px;
+            line-height: 20px;
+            vertical-align: top
+        }
+
+        table.hljs-ln td.hljs-ln-code {
+            position: relative;
+            padding-right: 10px;
+            padding-left: 10px;
+            overflow: visible;
+            color: #24292e;
+            word-wrap: normal;
+            white-space: pre
+        }
+
+        video::-webkit-media-controls {
+            overflow: hidden !important
+        }
+
+        video::-webkit-media-controls-enclosure {
+            width: calc(100% + 32px);
+            margin-left: auto
+        }
+
+        ._29HP61GA_0 {
+            max-width:800px;
+            margin:0 auto;
+            margin-bottom: 20px;
+            font-weight: 400;
+            color: #353535;
+            line-height: 1.76;
+            white-space: normal;
+            word-break: normal;
+            font-size: 17px;
+            -webkit-transition: background-color .3s ease;
+            transition: background-color .3s ease
+        }
+
+        ._29HP61GA_0 .MathJax_Display {
+            overflow: auto
+        }
+
+        ._29HP61GA_0 .poster {
+            position: fixed;
+            left: -10000px;
+            top: -10000px;
+            overflow: hidden;
+            padding: 1rem;
+            background: #ececec
+        }
+
+        ._29HP61GA_0 .richcontent-pre-copy {
+            font-size: 13px;
+            color: #888;
+            position: absolute;
+            right: 1em;
+            top: .5em;
+            cursor: pointer;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none
+        }
+
+        ._29HP61GA_0 .richcontent-pre-copy .iconfont {
+            font-size: 12px;
+            margin-right: .2em
+        }
+
+        ._29HP61GA_0 a {
+            color: #fa8919;
+            border-bottom: 1px solid #fa8919
+        }
+
+        ._29HP61GA_0 img {
+            display: block;
+            max-width: 100%;
+            position: relative;
+            left: 50%;
+            -webkit-transform: translateX(-50%);
+            transform: translateX(-50%);
+            background-color: #eee;
+            vertical-align: top;
+            border-radius: 0
+        }
+
+        ._29HP61GA_0 audio,
+        ._29HP61GA_0 video {
+            width: 100%;
+            background-color: #eee
+        }
+
+        ._29HP61GA_0 pre {
+            margin-top: 16px;
+            padding: 34px 0 0;
+            margin-bottom: 30px;
+            position: relative;
+            border-radius: 6px;
+            background: rgba(246, 247, 251, .749);
+            border: 0
+        }
+
+        ._29HP61GA_0 pre code {
+            font-size: 12px;
+            font-family: Consolas, Liberation Mono, Menlo, monospace, Courier;
+            display: block;
+            -webkit-box-sizing: border-box;
+            box-sizing: border-box;
+            margin-left: 16px;
+            margin-right: 16px;
+            overflow-x: scroll
+        }
+
+        ._29HP61GA_0 pre code:after {
+            content: "";
+            height: 30px;
+            width: 100%;
+            display: block
+        }
+
+        ._29HP61GA_0 hr {
+            border: none;
+            margin-top: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-top: 1px solid #f5f5f5;
+            height: 1px;
+            background: none
+        }
+
+        ._29HP61GA_0 h1,
+        ._29HP61GA_0 h2,
+        ._29HP61GA_0 h3,
+        ._29HP61GA_0 h4,
+        ._29HP61GA_0 h5 {
+            margin-bottom: 20px;
+            margin-top: 0;
+            font-weight: 700
+        }
+
+        ._29HP61GA_0 b,
+        ._29HP61GA_0 strong {
+            font-weight: 700
+        }
+
+        ._29HP61GA_0 h1 {
+            font-size: 21px
+        }
+
+        ._29HP61GA_0 h2 {
+            font-size: 20px
+        }
+
+        ._29HP61GA_0 h3 {
+            font-size: 19px
+        }
+
+        ._29HP61GA_0 h4 {
+            font-size: 18px
+        }
+
+        ._29HP61GA_0 h5 {
+            font-size: 17px
+        }
+
+        ._29HP61GA_0 center,
+        ._29HP61GA_0 p {
+            font-weight: 400;
+            color: #353535;
+            margin-top: 0;
+            margin-bottom: 30px;
+            word-break: break-word
+        }
+
+        ._29HP61GA_0 center {
+            text-align: center
+        }
+
+        ._29HP61GA_0 blockquote {
+            margin-top: 0;
+            margin-bottom: 34px;
+            border-left: 3px solid #e8e8e8;
+            padding-left: 17px;
+            color: #353535
+        }
+
+        ._29HP61GA_0 blockquote p {
+            margin-top: 0;
+            margin-bottom: 0
+        }
+
+        ._29HP61GA_0 ol,
+        ._29HP61GA_0 ul {
+            margin-bottom: 30px
+        }
+
+        ._29HP61GA_0 ol p,
+        ._29HP61GA_0 ul p {
+            margin-top: 0;
+            margin-bottom: 0
+        }
+
+        ._29HP61GA_0 ol {
+            list-style: decimal;
+            margin-left: 20px
+        }
+
+        ._29HP61GA_0 ul li {
+            padding-left: 17px;
+            position: relative;
+            margin-bottom: 10px
+        }
+
+        ._29HP61GA_0 ul li:after {
+            content: "";
+            height: 6px;
+            width: 6px;
+            border-radius: 50%;
+            background: #353535;
+            position: absolute;
+            top: 10px;
+            left: 0
+        }
+
+        ._29HP61GA_0 .orange {
+            color: #fa8919
+        }
+
+        ._29HP61GA_0 .reference {
+            color: #888
+        }
+
+        ._29HP61GA_0 .m-right {
+            text-align: right
+        }
+
+        ._29HP61GA_0 .m-center {
+            text-align: center;
+            display: block
+        }
+
+        ._29HP61GA_0 .m-gray {
+            color: #888
+        }
+
+        ._29HP61GA_0 .m-small {
+            font-size: 15px
+        }
+
+        ._29HP61GA_0 table.hljs-ln {
+            margin-bottom: 0;
+            border-spacing: 0;
+            border-collapse: collapse
+        }
+
+        ._29HP61GA_0 table.hljs-ln,
+        ._29HP61GA_0 table.hljs-ln tbody,
+        ._29HP61GA_0 table.hljs-ln td,
+        ._29HP61GA_0 table.hljs-ln tr {
+            -webkit-box-sizing: border-box;
+            box-sizing: border-box
+        }
+
+        ._29HP61GA_0 table.hljs-ln td {
+            padding: 0;
+            border: 0
+        }
+
+        ._29HP61GA_0 table.hljs-ln td.hljs-ln-numbers {
+            min-width: 15px;
+            font-size: 12px;
+            color: rgba(27, 31, 35, .3);
+            text-align: right;
+            white-space: nowrap;
+            cursor: pointer;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none
+        }
+
+        ._29HP61GA_0 table.hljs-ln td.hljs-ln-code,
+        ._29HP61GA_0 table.hljs-ln td.hljs-ln-numbers {
+            font-family: SFMono-Regular, Consolas, Liberation Mono, Menlo, Courier, monospace;
+            line-height: 20px;
+            vertical-align: top
+        }
+
+        ._29HP61GA_0 table.hljs-ln td.hljs-ln-code {
+            position: relative;
+            padding-right: 10px;
+            padding-left: 10px;
+            overflow: visible;
+            font-size: 13px;
+            color: #666;
+            word-wrap: normal;
+            white-space: pre
+        }
+
+    </style>
+</head>
+<body>
+<div class="_29HP61GA_0">
+<h1>15-MySQL存储海量数据的最后一招：分库分表</h1>
+<p>你好，我是李玥。</p><p>从这节课开始，我们课程将进入最后一部分“海量数据篇”，这节课也是我们最后一节主要讲MySQL的课程。解决海量数据的问题，必须要用到分布式的存储集群，因为MySQL本质上是一个单机数据库，所以很多场景下不是太适合存TB级别以上的数据。</p><p>但是，绝大部分的电商大厂，它的在线交易这部分的业务，比如说，订单、支付相关的系统，还是舍弃不了MySQL，原因是，<strong>只有MySQL这类关系型数据库，才能提供金融级的事务保证</strong>。我们之前也讲过分布式事务，那些新的分布式数据库提供的所谓的分布式事务，多少都有点儿残血，目前还达不到这些交易类系统对数据一致性的要求。</p><p>那既然MySQL支持不了这么大的数据量，这么高的并发，还必须要用它，怎么解决这个问题呢？还是按照我上节课跟你说的思想，<strong>分片</strong>，也就是拆分数据。1TB的数据，一个库撑不住，我把它拆成100个库，每个库就只有10GB的数据了，这不就可以了么？这种拆分就是所谓的MySQL分库分表。</p><p>不过，思路是这样没错，分库分表实践起来是非常不容易的，有很多问题需要去思考和解决。</p><h2>如何规划分库分表？</h2><p>还是拿咱们的“老熟人”订单表来举例子。首先需要思考的问题是，分库还是分表？分库呢，就是把数据拆分到不同的MySQL库中去，分表就是把数据拆分到同一个库的多张表里面。</p><!-- [[[read_end]]] --><p>在考虑到底是分库还是分表之前，我们需要先明确一个原则，<strong>那就是能不拆就不拆，能少拆不多拆</strong>。原因也很简单，你把数据拆分得越散，开发和维护起来就越麻烦，系统出问题的概率就越大。</p><p>基于这个原则我们想一下，什么情况下适合分表，什么情况下不得不分库？</p><p>那我们分库分表的目的是为了解决两个问题：</p><p>第一，是数据量太大查询慢的问题。这里面我们讲的“查询”其实主要是事务中的查询和更新操作，因为只读的查询可以通过缓存和主从分离来解决，这个我们在之前的“MySQL如何应对高并发”的两节课中都讲过。那我们上节课也讲到过，<strong>解决查询慢，只要减少每次查询的数据总量就可以了，也就是说，分表就可以解决问题</strong>。</p><p>第二，是为了应对高并发的问题。应对高并发的思想我们之前也说过，一个数据库实例撑不住，就把并发请求分散到多个实例中去，所以，<strong>解决高并发的问题是需要分库的</strong>。</p><p>简单地说，<strong>数据量大，就分表；并发高，就分库</strong>。</p><p>一般情况下，我们的方案都需要同时做分库分表，这时候分多少个库，多少张表，分别用预估的并发量和数据量来计算就可以了。</p><p>另外，我个人不建议你在方案中考虑二次扩容的问题，也就是考虑未来的数据量，把这次分库分表设计的容量都填满了之后，数据如何再次分裂的问题。</p><p>现在技术和业务变化这么快，等真正到了那个时候，业务早就变了，可能新的技术也出来了，你之前设计的二次扩容方案大概率是用不上的，所以没必要为了这个而增加方案的复杂程度。还是那句话，<strong>越简单的设计可靠性越高</strong>。</p><h2>如何选择Sharding Key？</h2><p>分库分表还有一个重要的问题是，选择一个合适的列或者说是属性，作为分表的依据，这个属性一般称为Sharding Key。像我们上节课讲到的归档历史订单的方法，它的Sharding Key就是订单完成时间。每次查询的时候，查询条件中必须带上这个时间，我们的程序就知道，三个月以前的数据查订单历史表，三个月内的数据查订单表，这就是一个简单的按照时间范围来分片的算法。</p><p>选择合适Sharding Key和分片算法非常重要，直接影响了分库分表的效果。我们首先来说如何选择Sharding Key的问题。</p><p><strong>选择这个Sharding Key最重要的参考因素是，我们的业务是如何访问数据的</strong>。</p><p>比如我们把订单ID作为Sharding Key来拆分订单表，那拆分之后，如果我们按照订单ID来查订单，就需要先根据订单ID和分片算法计算出，我要查的这个订单它在哪个分片上，也就是哪个库哪张表中，然后再去那个分片执行查询就可以了。</p><p>但是，当我打开“我的订单”这个页面的时候，它的查询条件是用户ID，这里没有订单ID，那就没法知道我们要查的订单在哪个分片上，就没法查了。当然你要强行查的话，那就只能把所有分片都查一遍，再合并查询结果，这个就很麻烦，而且性能很差，还不能分页。</p><p>那要是把用户ID作为Sharding Key呢？也会面临同样的问题，使用订单ID作为查询条件来查订单的时候，就没办法找到订单在哪个分片了。这个问题的解决办法是，在生成订单ID的时候，把用户ID的后几位作为订单ID的一部分，比如说，可以规定，18位订单号中，第10-14位是用户ID的后四位，这样按订单ID查询的时候，就可以根据订单ID中的用户ID找到分片。</p><p>那我们系统对订单的查询方式，肯定不只是按订单ID或者按用户ID这两种啊。比如说，商家希望看到的是自己店铺的订单，还有各种和订单相关的报表。对于这些查询需求，我们一旦对订单做了分库分表，就没法解决了。那怎么办呢？</p><p>一般的做法是，把订单数据同步到其他的存储系统中去，在其他的存储系统里面解决问题。比如说，我们可以再构建一个以店铺ID作为Sharding Key的只读订单库，专门供商家来使用。或者，把订单数据同步到HDFS中，然后用一些大数据技术来生成订单相关的报表。</p><p>所以你看，一旦做了分库分表，就会极大地限制数据库的查询能力，之前很简单的查询，分库分表之后，可能就没法实现了。所以我们在之前的课程中，先讲了各种各样的方法，来缓解数据多、并发高的问题，而一直没讲分库分表。<strong>分库分表一定是，数据量和并发大到所有招数都不好使了，我们才拿出来的最后一招。</strong></p><h2>如何选择分片算法？</h2><p>在上节课我给你留的思考题中，我们提到过，能不能用订单完成时间作为Sharding Key呢？比如说，我分12个分片，每个月一个分片，这样对查询的兼容要好很多，毕竟查询条件中带上时间范围，让查询只落到某一个分片上，还是比较容易的，我在查询界面上强制用户必须指定时间范围就行了。</p><p>这种做法有个很大的问题，比如现在是3月份，那基本上所有的查询都集中在3月份这个分片上，其他11个分片都闲着，这样不仅浪费资源，很可能你3月那个分片根本抗不住几乎全部的并发请求。这个问题就是“热点问题”。</p><p>也就是说，我们希望并发请求和数据能均匀地分布到每一个分片上，尽量避免出现热点。这是选择分片算法时需要考虑的一个重要的因素。一般常用的分片算法就那么几种，刚刚讲到的按照时间范围分片的方法是其中的一种。</p><p>基于范围来分片容易产生热点问题，不适合作为订单的分片方法，但是这种分片方法的优点也很突出，那就是对查询非常友好，基本上只要加上一个时间范围的查询条件，原来该怎么查，分片之后还可以怎么查。范围分片特别适合那种数据量非常大，但并发访问量不大的ToB系统。比如说，电信运营商的监控系统，它可能要采集所有人手机的信号质量，然后做一些分析，这个数据量非常大，但是这个系统的使用者是运营商的工作人员，并发量很少。这种情况下就很适合范围分片。</p><p>一般来说，订单表都采用更均匀的哈希分片算法。比如说，我们要分24个分片，选定了Sharding Key是用户ID，那我们决定某个用户的订单应该落到那个分片上的算法是，拿用户ID除以24，得到的余数就是分片号。这是最简单的取模算法，一般就可以满足大部分要求了。当然也有一些更复杂的哈希算法，像一致性哈希之类的，特殊情况下也可以使用。</p><p>需要注意的一点是，哈希分片算法能够分得足够均匀的前提条件是，用户ID后几位数字必须是均匀分布的。比如说，你在生成用户ID的时候，自定义了一个用户ID的规则，最后一位0是男性，1是女性，这样的用户ID哈希出来可能就没那么均匀，可能会出现热点。</p><p>还有一种分片的方法：查表法。查表法其实就是没有分片算法，决定某个Sharding Key落在哪个分片上，全靠人为来分配，分配的结果记录在一张表里面。每次执行查询的时候，先去表里查一下要找的数据在哪个分片中。</p><p>查表法的好处就是灵活，怎么分都可以，你用上面两种分片算法都没法分均匀的情况下，就可以用查表法，人为地来把数据分均匀了。查表法还有一个特好的地方是，它的分片是可以随时改变的。比如我发现某个分片已经是热点了，那我可以把这个分片再拆成几个分片，或者把这个分片的数据移到其他分片中去，然后修改一下分片映射表，就可以在线完成数据拆分了。</p><p><img src="https://static001.geekbang.org/resource/image/0f/9d/0faac5967ca1f9385d8f7eda8eedd09d.jpg" alt=""></p><p>但你需要注意的是，分片映射表本身的数据不能太多，否则这个表反而成为热点和性能瓶颈了。查表法相对其他两种分片算法来说，缺点是需要二次查询，实现起来更复杂，性能上也稍微慢一些。但是，分片映射表可以通过缓存来加速查询，实际性能并不会慢很多。</p><h2>小结</h2><p>对MySQL这样的单机数据库来说，分库分表是应对海量数据和高并发的最后一招，分库分表之后，将会对数据查询有非常大的限制。</p><p>分多少个库需要用并发量来预估，分多少表需要用数据量来预估。选择Sharding Key的时候，一定要能兼容业务最常用的查询条件，让查询尽量落在一个分片中，分片之后无法兼容的查询，可以把数据同步到其他存储中去，来解决这个问题。</p><p>我们常用三种分片算法，范围分片容易产生热点问题，但对查询更友好，适合适合并发量不大的场景；哈希分片比较容易把数据和查询均匀地分布到所有分片中；查表法更灵活，但性能稍差。</p><p>对于订单表进行分库分表，一般按照用户ID作为Sharding Key，采用哈希分片算法来均匀分布用户订单数据。为了能支持按订单号查询的需求，需要把用户ID的后几位放到订单号中去。</p><p>最后还需要强调一下，我们这节课讲的这些分片相关的知识，不仅仅适用于MySQL的分库分表，你在使用其他分布式数据库的时候，一样会遇到如何分片、如何选择Sharding Key和分片算法的问题，它们的原理都是一样的，所以我们讲的这些方法也都是通用的。</p><h2>思考题</h2><p>课后请你想一下，把订单表拆分之后，那些和订单有外键关联的表，该怎么处理？欢迎你在留言区与我讨论。</p><p>感谢你的阅读，如果你觉得今天的内容对你有帮助，也欢迎把它分享给你的朋友。</p><h2>精选留言：</h2>
+        <ul>
+        
+<li>
+    <div>
+        <div style="color: #888;font-size:15.25px;font-weight:400;            line-height:1.2">
+            李玥  2020-04-01 09:30:11
+        </div>
+        <div style="color:#353535;font-weight:400;white-space:normal;            word-break:break-all;line-height:1.6">
+            Hi，我是李玥。<br><br>这里回顾一下上节课的思考题：<br><br>在数据持续增长的过程中，今天介绍的这种“归档历史订单”的数据拆分方法，和直接进行分库分表相比，比如说按照订单创建时间，自动拆分成每个月一张表，两种方法各有什么优点和缺点？欢迎你在留言区与我讨论。<br><br>这个问题我在本节课中也提到了，简单的总结一下。按月自动拆分订单的好处是，不需要做数据搬运，相对实现比较简单，数据分得更碎，缺点是跨月查询比较麻烦，但好处是容量也更大（因为分片更多）。归档历史订单的方法，实现起来更复杂，容量要小一些，但是对查询更加友好。 
+        </div>
+        
+    </div>
+</li>
+            
+<br/>
+
+<li>
+    <div>
+        <div style="color: #888;font-size:15.25px;font-weight:400;            line-height:1.2">
+            虚竹  2020-03-31 15:09:38
+        </div>
+        <div style="color:#353535;font-weight:400;white-space:normal;            word-break:break-all;line-height:1.6">
+            老师好，订单id总共18位，10-14位放用户id的后几位，当用户要查询自己的所有订单时怎么查呢？这里没太明白 [1赞]
+        </div>
+        <br/>
+<div>
+    <div style="color:#888;font-size:15.25px;font-weight:400;        line-height:1.2">作者回复2020-04-02 12:27:19</div>
+    <div style="color:#353535;font-weight:400;white-space:normal;        word-break:break-all;line-height:1.6">直接用用户ID哈希，计算出这个用户的订单在哪个分片上，然后去查询就可以了。</div>
+</div>
+            
+    </div>
+</li>
+            
+<br/>
+
+<li>
+    <div>
+        <div style="color: #888;font-size:15.25px;font-weight:400;            line-height:1.2">
+            正在减肥的胖籽。  2020-03-31 14:35:00
+        </div>
+        <div style="color:#353535;font-weight:400;white-space:normal;            word-break:break-all;line-height:1.6">
+            老师您好，有几个问题需要请教你下：<br>1.运营后台查询数据，肯定就是查询很多数据，不止是单个用户的数据。京东怎么去处理运营后台的数据呢?是把数据同步到ES中还是？ [1赞]
+        </div>
+        <br/>
+<div>
+    <div style="color:#888;font-size:15.25px;font-weight:400;        line-height:1.2">作者回复2020-04-02 12:33:17</div>
+    <div style="color:#353535;font-weight:400;white-space:normal;        word-break:break-all;line-height:1.6">是的，一般是同步到其它的数据库中去解决。我会在19中来讲，如何做实时同步。</div>
+</div>
+            
+    </div>
+</li>
+            
+<br/>
+
+<li>
+    <div>
+        <div style="color: #888;font-size:15.25px;font-weight:400;            line-height:1.2">
+            Mq  2020-03-31 08:12:50
+        </div>
+        <div style="color:#353535;font-weight:400;white-space:normal;            word-break:break-all;line-height:1.6">
+            关联表可以冗余用户ID字段，跟订单表的都在一个库里吗，这样用户维度的交易都在一个库事物里面，大部分的关联查询也是在一个库里。<br>老师查找法有具体例子吗，我们之前也有过表按hash分后数据极度不均 [1赞]
+        </div>
+        <br/>
+<div>
+    <div style="color:#888;font-size:15.25px;font-weight:400;        line-height:1.2">作者回复2020-04-02 12:42:23</div>
+    <div style="color:#353535;font-weight:400;white-space:normal;        word-break:break-all;line-height:1.6">查表法一般可以配合哈希或者范围分片一起使用。<br><br>比如说，我们按用户ID哈希分成10个分片，其中第8个分片数据特别多不均匀。<br><br>那我们可以按用户ID哈希成100个逻辑分片。<br><br>再做一个100逻辑分片和10个物理分片的映射表，这个表里面只有100条记录。<br><br>那怎么来映射我们就可以人工分配，让10个物理分片中的数据尽量均匀。<br></div>
+</div>
+            
+    </div>
+</li>
+            
+<br/>
+
+<li>
+    <div>
+        <div style="color: #888;font-size:15.25px;font-weight:400;            line-height:1.2">
+            发条橙子 。  2020-04-03 00:47:28
+        </div>
+        <div style="color:#353535;font-weight:400;white-space:normal;            word-break:break-all;line-height:1.6">
+            老师 是直接用完整的用户id做哈希分片 还是那四位做哈希分片 
+        </div>
+        
+    </div>
+</li>
+            
+<br/>
+
+<li>
+    <div>
+        <div style="color: #888;font-size:15.25px;font-weight:400;            line-height:1.2">
+            电光火石  2020-04-02 14:11:41
+        </div>
+        <div style="color:#353535;font-weight:400;white-space:normal;            word-break:break-all;line-height:1.6">
+            老师，请教一下：18 位订单号中，第 10-14 位是用户 ID 的后四位，这样按订单 ID 查询的时候，就可以根据订单 ID 中的用户 ID 找到分片。<br>这里实际上是根据是用户 ID 的后四位为base做分片是吗？这样按照用户id维度和订单维度都可以先定位分片再进行查询。<br><br>把订单表拆分之后，那些和订单有外键关联的表，该怎么处理？<br>插入的时候，是否根据订单的分区规则，将有外键关联的表尽量放在一个分片里面进行处理。 
+        </div>
+        
+    </div>
+</li>
+            
+<br/>
+
+<li>
+    <div>
+        <div style="color: #888;font-size:15.25px;font-weight:400;            line-height:1.2">
+            leslie  2020-04-02 01:08:04
+        </div>
+        <div style="color:#353535;font-weight:400;white-space:normal;            word-break:break-all;line-height:1.6">
+            是不是漏了另外一种拆分方式：纵向拆分？分表应当还有一个原因，早期数据量小可以几十个字段都没有关系；后期数据量大了，多列查询导致了一些性能问题。我自己在生产中就碰到了设计的不合理性，做了纵向分表-效果还不错，精度只能靠实战、学习、反思去提升。<br>课程中提及的分表所引发的外键问题其实应当和DML有关：查询并无影响。个人觉得影响不大，细看是多张表，但是设计时其实还是一张；查询时对应的判断补进去就好。 
+        </div>
+        <br/>
+<div>
+    <div style="color:#888;font-size:15.25px;font-weight:400;        line-height:1.2">作者回复2020-04-02 09:58:32</div>
+    <div style="color:#353535;font-weight:400;white-space:normal;        word-break:break-all;line-height:1.6">👍👍👍</div>
+</div>
+            
+    </div>
+</li>
+            
+<br/>
+
+<li>
+    <div>
+        <div style="color: #888;font-size:15.25px;font-weight:400;            line-height:1.2">
+            gfgf  2020-04-01 14:30:35
+        </div>
+        <div style="color:#353535;font-weight:400;white-space:normal;            word-break:break-all;line-height:1.6">
+            用户id和订单id关联这块，订单中取用户id的几位来做分区分表的依据，这个做法是否会造成数据量的不均衡；<br>看到个人淘宝订单是嵌入了用户id的后几位，但是京东订单没有发现规律，这块能否请老师以淘宝和京东订单为例，做一个更深入的介绍 
+        </div>
+        <br/>
+<div>
+    <div style="color:#888;font-size:15.25px;font-weight:400;        line-height:1.2">作者回复2020-04-02 10:01:23</div>
+    <div style="color:#353535;font-weight:400;white-space:normal;        word-break:break-all;line-height:1.6">订单号是怎么构成的，应该算是商业秘密了。因为如果你知道它的规律，是有可能从中获得一些信息的。所以各家都不会公布自己的订单号是如何构成的。</div>
+</div>
+            
+    </div>
+</li>
+            
+<br/>
+
+<li>
+    <div>
+        <div style="color: #888;font-size:15.25px;font-weight:400;            line-height:1.2">
+            靠人品去赢  2020-04-01 12:06:11
+        </div>
+        <div style="color:#353535;font-weight:400;white-space:normal;            word-break:break-all;line-height:1.6">
+            我觉得是外联的表数据量是不是也很大，如果外联的表并发小，数量少，其实不必要管他更不用也对他进行分库分表，因为从维护角度讲，能不拆就不拆，毕竟这是最后一步。 
+        </div>
+        
+    </div>
+</li>
+            
+<br/>
+
+<li>
+    <div>
+        <div style="color: #888;font-size:15.25px;font-weight:400;            line-height:1.2">
+            每天晒白牙  2020-04-01 08:58:02
+        </div>
+        <div style="color:#353535;font-weight:400;white-space:normal;            word-break:break-all;line-height:1.6">
+            分库分表的原则<br>能不拆就不拆，能少拆就少拆<br><br>分库分表的目的<br>1.数据量大查询慢的问题<br>解决查询慢就是减少每次查询的数据量，即分表可以解决该问题<br>2.应对高并发的问题<br>一个数据库实例撑不住就分散到多个实例中去，即分库可以解决<br><br>概括就是数据量大就分表，高并发就分库<br><br>如何选择 sharding key?<br>这是分表的依据，选择要考虑的因素取决于业务如何访问数据，让查询尽量落到一个分片中。如果分片无法兼容查询，可以把数据同步到其他存储中，供查询<br><br>常见的分片算法<br>1.范围分片<br>对查询友好，适合并发量不大的场景。但容易产生热点数据<br>2.哈希分片<br>比较均匀<br>3.查表法<br>灵活，性能差因为多了一次查表<br><br>实例案例<br>订单表分库分表<br>一般按用户id分，采用哈希分片算法。为了支持按订单号查询，可以把用户id的后几位放到订单号中 
+        </div>
+        
+    </div>
+</li>
+            
+<br/>
+
+<li>
+    <div>
+        <div style="color: #888;font-size:15.25px;font-weight:400;            line-height:1.2">
+            一步  2020-03-31 10:36:38
+        </div>
+        <div style="color:#353535;font-weight:400;white-space:normal;            word-break:break-all;line-height:1.6">
+            分库分表使用的场景是不一样的，分表是因为数据量比较大查询较慢才进行的，分库是因为单库的性能无法满足要求才进行的 
+        </div>
+        
+    </div>
+</li>
+            
+<br/>
+
+<li>
+    <div>
+        <div style="color: #888;font-size:15.25px;font-weight:400;            line-height:1.2">
+            sami  2020-03-31 09:20:20
+        </div>
+        <div style="color:#353535;font-weight:400;white-space:normal;            word-break:break-all;line-height:1.6">
+            感觉Redis Cluster的分片规则有点像查表法 
+        </div>
+        <br/>
+<div>
+    <div style="color:#888;font-size:15.25px;font-weight:400;        line-height:1.2">作者回复2020-04-02 12:37:13</div>
+    <div style="color:#353535;font-weight:400;white-space:normal;        word-break:break-all;line-height:1.6">你说的没错！</div>
+</div>
+            
+    </div>
+</li>
+            
+<br/>
+
+<li>
+    <div>
+        <div style="color: #888;font-size:15.25px;font-weight:400;            line-height:1.2">
+            饭团  2020-03-31 08:12:56
+        </div>
+        <div style="color:#353535;font-weight:400;white-space:normal;            word-break:break-all;line-height:1.6">
+            老师您好，您提到的把用户id放到订单id中，是说如果用订单id去做查询，就把第10-14位取出来，之后再用这部分去查询是吗？ 
+        </div>
+        <br/>
+<div>
+    <div style="color:#888;font-size:15.25px;font-weight:400;        line-height:1.2">作者回复2020-04-02 12:37:28</div>
+    <div style="color:#353535;font-weight:400;white-space:normal;        word-break:break-all;line-height:1.6">是的<br></div>
+</div>
+            
+    </div>
+</li>
+            </ul>
+</div>
+</body>
+</html>
