@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html><head>
+    <meta charset="utf-8"> 
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>listing directory /learning/后端存储实战课/html/</title>
+    <style>* {
+  margin: 0;
+  padding: 0;
+  outline: 0;
+}
+
+body {
+  padding: 80px 100px;
+  font: 13px "Helvetica Neue", "Lucida Grande", "Arial";
+  background: #ECE9E9 -webkit-gradient(linear, 0% 0%, 0% 100%, from(#fff), to(#ECE9E9));
+  background: #ECE9E9 -moz-linear-gradient(top, #fff, #ECE9E9);
+  background-repeat: no-repeat;
+  color: #555;
+  -webkit-font-smoothing: antialiased;
+}
+h1, h2, h3 {
+  font-size: 22px;
+  color: #343434;
+}
+h1 em, h2 em {
+  padding: 0 5px;
+  font-weight: normal;
+}
+h1 {
+  font-size: 60px;
+}
+h2 {
+  margin-top: 10px;
+}
+h3 {
+  margin: 5px 0 10px 0;
+  padding-bottom: 5px;
+  border-bottom: 1px solid #eee;
+  font-size: 18px;
+}
+ul li {
+  list-style: none;
+}
+ul li:hover {
+  cursor: pointer;
+  color: #2e2e2e;
+}
+ul li .path {
+  padding-left: 5px;
+  font-weight: bold;
+}
+ul li .line {
+  padding-right: 5px;
+  font-style: italic;
+}
+ul li:first-child .path {
+  padding-left: 0;
+}
+p {
+  line-height: 1.5;
+}
+a {
+  color: #555;
+  text-decoration: none;
+}
+a:hover {
+  color: #303030;
+}
+#stacktrace {
+  margin-top: 15px;
+}
+.directory h1 {
+  margin-bottom: 15px;
+  font-size: 18px;
+}
+ul#files {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+ul#files li {
+  float: left;
+  width: 30%;
+  line-height: 25px;
+  margin: 1px;
+}
+ul#files li a {
+  display: block;
+  height: 25px;
+  border: 1px solid transparent;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+  overflow: hidden;
+  white-space: nowrap;
+}
+ul#files li a:focus,
+ul#files li a:hover {
+  background: rgba(255,255,255,0.65);
+  border: 1px solid #ececec;
+}
+ul#files li a.highlight {
+  -webkit-transition: background .4s ease-in-out;
+  background: #ffff4f;
+  border-color: #E9DC51;
+}
+#search {
+  display: block;
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  width: 90px;
+  -webkit-transition: width ease 0.2s, opacity ease 0.4s;
+  -moz-transition: width ease 0.2s, opacity ease 0.4s;
+  -webkit-border-radius: 32px;
+  -moz-border-radius: 32px;
+  -webkit-box-shadow: inset 0px 0px 3px rgba(0, 0, 0, 0.25), inset 0px 1px 3px rgba(0, 0, 0, 0.7), 0px 1px 0px rgba(255, 255, 255, 0.03);
+  -moz-box-shadow: inset 0px 0px 3px rgba(0, 0, 0, 0.25), inset 0px 1px 3px rgba(0, 0, 0, 0.7), 0px 1px 0px rgba(255, 255, 255, 0.03);
+  -webkit-font-smoothing: antialiased;
+  text-align: left;
+  font: 13px "Helvetica Neue", Arial, sans-serif;
+  padding: 4px 10px;
+  border: none;
+  background: transparent;
+  margin-bottom: 0;
+  outline: none;
+  opacity: 0.7;
+  color: #888;
+}
+#search:focus {
+  width: 120px;
+  opacity: 1.0; 
+}
+
+/*views*/
+#files span {
+  display: inline-block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-indent: 10px;
+}
+#files .name {
+  background-repeat: no-repeat;
+}
+#files .icon .name {
+  text-indent: 28px;
+}
+
+/*tiles*/
+.view-tiles .name {
+  width: 100%;
+  background-position: 8px 5px;
+}
+.view-tiles .size,
+.view-tiles .date {
+  display: none;
+}
+
+/*details*/
+ul#files.view-details li {
+  float: none;
+  display: block;
+  width: 90%;
+}
+ul#files.view-details li.header {
+  height: 25px;
+  background: #000;
+  color: #fff;
+  font-weight: bold;
+}
+.view-details .header {
+  border-radius: 5px;
+}
+.view-details .name {
+  width: 60%;
+  background-position: 8px 5px;
+}
+.view-details .size {
+  width: 10%;
+}
+.view-details .date {
+  width: 30%;
+}
+.view-details .size,
+.view-details .date {
+  text-align: right;
+  direction: rtl;
+}
+
+/*mobile*/
+@media (max-width: 768px) {
+  body {
+    font-size: 13px;
+    line-height: 16px;
+    padding: 0;
+  }
+  #search {
+    position: static;
+    width: 100%;
+    font-size: 2em;
+    line-height: 1.8em;
+    text-indent: 10px;
+    border: 0;
+    border-radius: 0;
+    padding: 10px 0;
+    margin: 0;
+  }
+  #search:focus {
+    width: 100%;
+    border: 0;
+    opacity: 1;
+  }
+  .directory h1 {
+    font-size: 2em;
+    line-height: 1.5em;
+    color: #fff;
+    background: #000;
+    padding: 15px 10px;
+    margin: 0;
+  }
+  ul#files {
+    border-top: 1px solid #cacaca;
+  }
+  ul#files li {
+    float: none;
+    width: auto !important;
+    display: block;
+    border-bottom: 1px solid #cacaca;
+    font-size: 2em;
+    line-height: 1.2em;
+    text-indent: 0;
+    margin: 0;
+  }
+  ul#files li:nth-child(odd) {
+    background: #e0e0e0;
+  }
+  ul#files li a {
+    height: auto;
+    border: 0;
+    border-radius: 0;
+    padding: 15px 10px;
+  }
+  ul#files li a:focus,
+  ul#files li a:hover {
+    border: 0;
+  }
+  #files .header,
+  #files .size,
+  #files .date {
+    display: none !important;
+  }
+  #files .name {
+    float: none;
+    display: inline-block;
+    width: 100%;
+    text-indent: 0;
+    background-position: 0 50%;
+  }
+  #files .icon .name {
+    text-indent: 41px;
+  }
+}
+#files .icon-directory .name {
+  background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAABGdBTUEAALGPC/xhBQAAAWtQTFRFAAAA/PPQ9Nhc2q402qQ12qs2/PTX2pg12p81+/LM89NE9dto2q82+/fp2rM22qY39d6U+/bo2qo2/frx/vz32q812qs12qE279SU8c4w9NZP+/LK//367s9y7s925cp0/vzw9t92//342po2/vz25s1579B6+OSO2bQ0/v799NyT8tE79dld8Msm+OrC/vzx79KA2IYs7s6I9d6R4cJe9+OF/PLI/fry79OF/v30//328tWB89RJ8c9p8c0u9eCf//7+9txs6sts5Mdr+++5+u2z/vrv+/fq6cFz8dBs8tA57cpq+OaU9uGs27Y8//799NdX/PbY9uB89unJ//z14sNf+emh+emk+vDc+uys9+OL8dJy89NH+eic8tN5+OaV+OWR9N2n9dtl9t529+KF9+GB9Nue9NdU8tR/9t5y89qW9dpj89iO89eG/vvu2pQ12Y4z/vzy2Ict/vvv48dr/vzz4sNg///+2Igty3PqwQAAAAF0Uk5TAEDm2GYAAACtSURBVBjTY2AgA2iYlJWVhfohBPg0yx38y92dS0pKVOVBAqIi6sb2vsWWpfrFeTI8QAEhYQEta28nCwM1OVleZqCAmKCEkUdwYWmhQnFeOStQgL9cySqkNNDHVJGbiY0FKCCuYuYSGRsV5KgjxcXIARRQNncNj09JTgqw0ZbkZAcK5LuFJaRmZqfHeNnpSucDBQoiEtOycnIz4qI9bfUKQA6pKKqAgqIKQyK8BgAZ5yfODmnHrQAAAABJRU5ErkJggg==);
+}
+#files .icon-text-html .name {
+  background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAAK/INwWK6QAAABl0RVh0U29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAAHtSURBVDjLjZM9T9tQFIYpQ5eOMBKlW6eWIQipa8RfQKQghEAKqZgKFQgmFn5AWyVDCipVQZC2EqBWlEqdO2RCpAssQBRsx1+1ndix8wFvfW6wcUhQsfTI0j33PD7n+N4uAF2E+/S5RFwG/8Njl24/LyCIOI6j1+v1y0ajgU64cSSTybdBSVAwSMmmacKyLB/DMKBpGkRRZBJBEJBKpXyJl/yABLTBtm1Uq1X2JsrlMnRdhyRJTFCpVEAfSafTTUlQoFs1luxBAkoolUqQZbmtJTYTT/AoHInOfpcwtVtkwcSBgrkDGYph+60oisIq4Xm+VfB0+U/P0Lvj3NwPGfHPTcHMvoyFXwpe7UmQtAqTUCU0D1VVbwTPVk5jY19Fe3ZfQny7CE51WJDXqpjeEUHr45ki9rIqa4dmQiJfMLItGEs/FcQ2ucbRmdnSYy5vYWyLx/w3EaMfLmBaDpMQvuDJ65PY8Dpnz3wpYmLtApzcrIAqmfrEgdZH1grY/a36w6Xz0DKD8ES25/niYS6+wWE8mWfByY8cXmYEJFYLkHUHtVqNQcltAvoLD3v7o/FUHsNvzlnwxfsCEukC/ho3yUHaBN5Buo17Ojtyl+DqrnvQgUtfcC0ZcAdkUeA+ye7eMru9AUGIJPe4zh509UP/AAfNypi8oj/mAAAAAElFTkSuQmCC);
+}
+</style>
+    <script>
+      function $(id){
+        var el = 'string' == typeof id
+          ? document.getElementById(id)
+          : id;
+
+        el.on = function(event, fn){
+          if ('content loaded' == event) {
+            event = window.attachEvent ? "load" : "DOMContentLoaded";
+          }
+          el.addEventListener
+            ? el.addEventListener(event, fn, false)
+            : el.attachEvent("on" + event, fn);
+        };
+
+        el.all = function(selector){
+          return $(el.querySelectorAll(selector));
+        };
+
+        el.each = function(fn){
+          for (var i = 0, len = el.length; i < len; ++i) {
+            fn($(el[i]), i);
+          }
+        };
+
+        el.getClasses = function(){
+          return this.getAttribute('class').split(/\s+/);
+        };
+
+        el.addClass = function(name){
+          var classes = this.getAttribute('class');
+          el.setAttribute('class', classes
+            ? classes + ' ' + name
+            : name);
+        };
+
+        el.removeClass = function(name){
+          var classes = this.getClasses().filter(function(curr){
+            return curr != name;
+          });
+          this.setAttribute('class', classes.join(' '));
+        };
+
+        return el;
+      }
+
+      function search() {
+        var str = $('search').value.toLowerCase();
+        var links = $('files').all('a');
+
+        links.each(function(link){
+          var text = link.textContent.toLowerCase();
+
+          if ('..' == text) return;
+          if (str.length && ~text.indexOf(str)) {
+            link.addClass('highlight');
+          } else {
+            link.removeClass('highlight');
+          }
+        });
+      }
+
+      $(window).on('content loaded', function(){
+        $('search').on('keyup', search);
+      });
+    </script>
+  </head>
+  <body class="directory">
+    <input id="search" type="text" placeholder="Search" autocomplete="off">
+    <div id="wrapper">
+      <h1><a href="/learning/后端存储实战课">~</a> / <a href="/learning/后端存储实战课/html">html</a> / </h1>
+      <ul id="files" class="view-tiles"><li><a href="/learning/后端存储实战课" class="icon icon-directory" title=".."><span class="name">..</span><span class="size"></span><span class="date"></span></a></li>
+<li><a href="/learning/后端存储实战课/html/01-%E5%88%9B%E5%BB%BA%E5%92%8C%E6%9B%B4%E6%96%B0%E8%AE%A2%E5%8D%95%E6%97%B6%EF%BC%8C%E5%A6%82%E4%BD%95%E4%BF%9D%E8%AF%81%E6%95%B0%E6%8D%AE%E5%87%86%E7%A1%AE%E6%97%A0%E8%AF%AF%EF%BC%9F_For_group_share.html" class="icon icon icon-html icon-text-html" title="01-创建和更新订单时，如何保证数据准确无误？_For_group_share.html"><span class="name">01-创建和更新订单时，如何保证数据准确无误？_For_group_share.html</span><span class="size">36348</span><span class="date">2020/11/1 下午7:40:22</span></a></li>
+<li><a href="/learning/后端存储实战课/html/02-%E6%B5%81%E9%87%8F%E5%A4%A7%E3%80%81%E6%95%B0%E6%8D%AE%E5%A4%9A%E7%9A%84%E5%95%86%E5%93%81%E8%AF%A6%E6%83%85%E9%A1%B5%E7%B3%BB%E7%BB%9F%E8%AF%A5%E5%A6%82%E4%BD%95%E8%AE%BE%E8%AE%A1%EF%BC%9F_For_group_share.html" class="icon icon icon-html icon-text-html" title="02-流量大、数据多的商品详情页系统该如何设计？_For_group_share.html"><span class="name">02-流量大、数据多的商品详情页系统该如何设计？_For_group_share.html</span><span class="size">37314</span><span class="date">2020/11/1 下午7:40:27</span></a></li>
+<li><a href="/learning/后端存储实战课/html/03-%E5%A4%8D%E6%9D%82%E8%80%8C%E5%8F%88%E9%87%8D%E8%A6%81%E7%9A%84%E8%B4%AD%E7%89%A9%E8%BD%A6%E7%B3%BB%E7%BB%9F%EF%BC%8C%E5%BA%94%E8%AF%A5%E5%A6%82%E4%BD%95%E8%AE%BE%E8%AE%A1%EF%BC%9F_For_group_share.html" class="icon icon icon-html icon-text-html" title="03-复杂而又重要的购物车系统，应该如何设计？_For_group_share.html"><span class="name">03-复杂而又重要的购物车系统，应该如何设计？_For_group_share.html</span><span class="size">40622</span><span class="date">2020/11/1 下午7:40:24</span></a></li>
+<li><a href="/learning/后端存储实战课/html/04-%E4%BA%8B%E5%8A%A1%EF%BC%9A%E8%B4%A6%E6%88%B7%E4%BD%99%E9%A2%9D%E6%80%BB%E6%98%AF%E5%AF%B9%E4%B8%8D%E4%B8%8A%E8%B4%A6%EF%BC%8C%E6%80%8E%E4%B9%88%E5%8A%9E%EF%BC%9F_For_group_share.html" class="icon icon icon-html icon-text-html" title="04-事务：账户余额总是对不上账，怎么办？_For_group_share.html"><span class="name">04-事务：账户余额总是对不上账，怎么办？_For_group_share.html</span><span class="size">52758</span><span class="date">2020/11/1 下午7:40:25</span></a></li>
+<li><a href="/learning/后端存储实战课/html/05-%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1%EF%BC%9A%E5%A6%82%E4%BD%95%E4%BF%9D%E8%AF%81%E5%A4%9A%E4%B8%AA%E7%B3%BB%E7%BB%9F%E9%97%B4%E7%9A%84%E6%95%B0%E6%8D%AE%E6%98%AF%E4%B8%80%E8%87%B4%E7%9A%84%EF%BC%9F_For_group_share.html" class="icon icon icon-html icon-text-html" title="05-分布式事务：如何保证多个系统间的数据是一致的？_For_group_share.html"><span class="name">05-分布式事务：如何保证多个系统间的数据是一致的？_For_group_share.html</span><span class="size">42569</span><span class="date">2020/11/1 下午7:40:26</span></a></li>
+<li><a href="/learning/后端存储实战课/html/06-%E5%A6%82%E4%BD%95%E7%94%A8Elasticsearch%E6%9E%84%E5%BB%BA%E5%95%86%E5%93%81%E6%90%9C%E7%B4%A2%E7%B3%BB%E7%BB%9F%EF%BC%9F_For_group_share.html" class="icon icon icon-html icon-text-html" title="06-如何用Elasticsearch构建商品搜索系统？_For_group_share.html"><span class="name">06-如何用Elasticsearch构建商品搜索系统？_For_group_share.html</span><span class="size">40253</span><span class="date">2020/11/1 下午7:40:28</span></a></li>
+<li><a href="/learning/后端存储实战课/html/07-MySQLHA%EF%BC%9A%E5%A6%82%E4%BD%95%E5%B0%86%E2%80%9C%E5%88%A0%E5%BA%93%E8%B7%91%E8%B7%AF%E2%80%9D%E7%9A%84%E6%8D%9F%E5%A4%B1%E9%99%8D%E5%88%B0%E6%9C%80%E4%BD%8E%EF%BC%9F_For_group_share.html" class="icon icon icon-html icon-text-html" title="07-MySQLHA：如何将“删库跑路”的损失降到最低？_For_group_share.html"><span class="name">07-MySQLHA：如何将“删库跑路”的损失降到最低？_For_group_share.html</span><span class="size">40143</span><span class="date">2020/11/1 下午7:40:29</span></a></li>
+<li><a href="/learning/后端存储实战课/html/07%EF%BD%9CMySQLHA%EF%BC%9A%E5%A6%82%E4%BD%95%E5%B0%86%E2%80%9C%E5%88%A0%E5%BA%93%E8%B7%91%E8%B7%AF%E2%80%9D%E7%9A%84%E6%8D%9F%E5%A4%B1%E9%99%8D%E5%88%B0%E6%9C%80%E4%BD%8E%EF%BC%9F_For_group_share.html" class="icon icon icon-html icon-text-html" title="07｜MySQLHA：如何将“删库跑路”的损失降到最低？_For_group_share.html"><span class="name">07｜MySQLHA：如何将“删库跑路”的损失降到最低？_For_group_share.html</span><span class="size">40147</span><span class="date">2020/11/1 下午7:40:30</span></a></li>
+<li><a href="/learning/后端存储实战课/html/08-%E4%B8%80%E4%B8%AA%E5%87%A0%E4%B9%8E%E6%AF%8F%E4%B8%AA%E7%B3%BB%E7%BB%9F%E5%BF%85%E8%B8%A9%E7%9A%84%E5%9D%91%E5%84%BF%EF%BC%9A%E8%AE%BF%E9%97%AE%E6%95%B0%E6%8D%AE%E5%BA%93%E8%B6%85%E6%97%B6_For_group_share.html" class="icon icon icon-html icon-text-html" title="08-一个几乎每个系统必踩的坑儿：访问数据库超时_For_group_share.html"><span class="name">08-一个几乎每个系统必踩的坑儿：访问数据库超时_For_group_share.html</span><span class="size">40386</span><span class="date">2020/11/1 下午7:40:31</span></a></li>
+<li><a href="/learning/后端存储实战课/html/09-%E6%80%8E%E4%B9%88%E8%83%BD%E9%81%BF%E5%85%8D%E5%86%99%E5%87%BA%E6%85%A2SQL%EF%BC%9F_For_group_share.html" class="icon icon icon-html icon-text-html" title="09-怎么能避免写出慢SQL？_For_group_share.html"><span class="name">09-怎么能避免写出慢SQL？_For_group_share.html</span><span class="size">37112</span><span class="date">2020/11/1 下午7:40:31</span></a></li>
+<li><a href="/learning/后端存储实战课/html/10-%E8%B5%B0%E8%BF%9B%E9%BB%91%E7%9B%92%EF%BC%9ASQL%E6%98%AF%E5%A6%82%E4%BD%95%E5%9C%A8%E6%95%B0%E6%8D%AE%E5%BA%93%E4%B8%AD%E6%89%A7%E8%A1%8C%E7%9A%84%EF%BC%9F_For_group_share.html" class="icon icon icon-html icon-text-html" title="10-走进黑盒：SQL是如何在数据库中执行的？_For_group_share.html"><span class="name">10-走进黑盒：SQL是如何在数据库中执行的？_For_group_share.html</span><span class="size">37977</span><span class="date">2020/11/1 下午7:40:32</span></a></li>
+<li><a href="/learning/后端存储实战课/html/11-MySQL%E5%A6%82%E4%BD%95%E5%BA%94%E5%AF%B9%E9%AB%98%E5%B9%B6%E5%8F%91%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9A%E4%BD%BF%E7%94%A8%E7%BC%93%E5%AD%98%E4%BF%9D%E6%8A%A4MySQL_For_group_share.html" class="icon icon icon-html icon-text-html" title="11-MySQL如何应对高并发（一）：使用缓存保护MySQL_For_group_share.html"><span class="name">11-MySQL如何应对高并发（一）：使用缓存保护MySQL_For_group_share.html</span><span class="size">47613</span><span class="date">2020/11/1 下午7:40:33</span></a></li>
+<li><a href="/learning/后端存储实战课/html/12-MySQL%E5%A6%82%E4%BD%95%E5%BA%94%E5%AF%B9%E9%AB%98%E5%B9%B6%E5%8F%91%EF%BC%88%E4%BA%8C%EF%BC%89%EF%BC%9A%E8%AF%BB%E5%86%99%E5%88%86%E7%A6%BB_For_group_share.html" class="icon icon icon-html icon-text-html" title="12-MySQL如何应对高并发（二）：读写分离_For_group_share.html"><span class="name">12-MySQL如何应对高并发（二）：读写分离_For_group_share.html</span><span class="size">39957</span><span class="date">2020/11/1 下午7:40:34</span></a></li>
+<li><a href="/learning/后端存储实战课/html/13-MySQL%E4%B8%BB%E4%BB%8E%E6%95%B0%E6%8D%AE%E5%BA%93%E5%90%8C%E6%AD%A5%E6%98%AF%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0%E7%9A%84%EF%BC%9F_For_group_share.html" class="icon icon icon-html icon-text-html" title="13-MySQL主从数据库同步是如何实现的？_For_group_share.html"><span class="name">13-MySQL主从数据库同步是如何实现的？_For_group_share.html</span><span class="size">33979</span><span class="date">2020/11/1 下午7:40:35</span></a></li>
+<li><a href="/learning/后端存储实战课/html/14-%E8%AE%A2%E5%8D%95%E6%95%B0%E6%8D%AE%E8%B6%8A%E6%9D%A5%E8%B6%8A%E5%A4%9A%EF%BC%8C%E6%95%B0%E6%8D%AE%E5%BA%93%E8%B6%8A%E6%9D%A5%E8%B6%8A%E6%85%A2%E8%AF%A5%E6%80%8E%E4%B9%88%E5%8A%9E%EF%BC%9F_For_group_share.html" class="icon icon icon-html icon-text-html" title="14-订单数据越来越多，数据库越来越慢该怎么办？_For_group_share.html"><span class="name">14-订单数据越来越多，数据库越来越慢该怎么办？_For_group_share.html</span><span class="size">48029</span><span class="date">2020/11/1 下午7:40:41</span></a></li>
+<li><a href="/learning/后端存储实战课/html/15-MySQL%E5%AD%98%E5%82%A8%E6%B5%B7%E9%87%8F%E6%95%B0%E6%8D%AE%E7%9A%84%E6%9C%80%E5%90%8E%E4%B8%80%E6%8B%9B%EF%BC%9A%E5%88%86%E5%BA%93%E5%88%86%E8%A1%A8_For_group_share.html" class="icon icon icon-html icon-text-html" title="15-MySQL存储海量数据的最后一招：分库分表_For_group_share.html"><span class="name">15-MySQL存储海量数据的最后一招：分库分表_For_group_share.html</span><span class="size">44026</span><span class="date">2020/11/1 下午7:40:36</span></a></li>
+<li><a href="/learning/后端存储实战课/html/16-%E7%94%A8Redis%E6%9E%84%E5%BB%BA%E7%BC%93%E5%AD%98%E9%9B%86%E7%BE%A4%E7%9A%84%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5%E6%9C%89%E5%93%AA%E4%BA%9B%EF%BC%9F_For_group_share.html" class="icon icon icon-html icon-text-html" title="16-用Redis构建缓存集群的最佳实践有哪些？_For_group_share.html"><span class="name">16-用Redis构建缓存集群的最佳实践有哪些？_For_group_share.html</span><span class="size">38348</span><span class="date">2020/11/1 下午7:40:38</span></a></li>
+<li><a href="/learning/后端存储实战课/html/17-%E5%A4%A7%E5%8E%82%E9%83%BD%E6%98%AF%E6%80%8E%E4%B9%88%E5%81%9AMySQLtoRedis%E5%90%8C%E6%AD%A5%E7%9A%84-_For_group_share.html" class="icon icon icon-html icon-text-html" title="17-大厂都是怎么做MySQLtoRedis同步的-_For_group_share.html"><span class="name">17-大厂都是怎么做MySQLtoRedis同步的-_For_group_share.html</span><span class="size">41095</span><span class="date">2020/11/1 下午7:40:40</span></a></li>
+<li><a href="/learning/后端存储实战课/html/18-%E5%88%86%E5%B8%83%E5%BC%8F%E5%AD%98%E5%82%A8%EF%BC%9A%E4%BD%A0%E7%9F%A5%E9%81%93%E5%AF%B9%E8%B1%A1%E5%AD%98%E5%82%A8%E6%98%AF%E5%A6%82%E4%BD%95%E4%BF%9D%E5%AD%98%E5%9B%BE%E7%89%87%E6%96%87%E4%BB%B6%E7%9A%84%E5%90%97%EF%BC%9F_For_group_share.html" class="icon icon icon-html icon-text-html" title="18-分布式存储：你知道对象存储是如何保存图片文件的吗？_For_group_share.html"><span class="name">18-分布式存储：你知道对象存储是如何保存图片文件的吗？_For_group_share.html</span><span class="size">33846</span><span class="date">2020/11/1 下午7:40:42</span></a></li>
+<li><a href="/learning/后端存储实战课/html/19-%E8%B7%A8%E7%B3%BB%E7%BB%9F%E5%AE%9E%E6%97%B6%E5%90%8C%E6%AD%A5%E6%95%B0%E6%8D%AE%EF%BC%8C%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1%E6%98%AF%E5%94%AF%E4%B8%80%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88%E5%90%97%EF%BC%9F_For_group_share.html" class="icon icon icon-html icon-text-html" title="19-跨系统实时同步数据，分布式事务是唯一的解决方案吗？_For_group_share.html"><span class="name">19-跨系统实时同步数据，分布式事务是唯一的解决方案吗？_For_group_share.html</span><span class="size">35641</span><span class="date">2020/11/1 下午7:40:44</span></a></li>
+<li><a href="/learning/后端存储实战课/html/20-%E5%A6%82%E4%BD%95%E5%9C%A8%E4%B8%8D%E5%81%9C%E6%9C%BA%E7%9A%84%E6%83%85%E5%86%B5%E4%B8%8B%EF%BC%8C%E5%AE%89%E5%85%A8%E5%9C%B0%E6%9B%B4%E6%8D%A2%E6%95%B0%E6%8D%AE%E5%BA%93%EF%BC%9F_For_group_share.html" class="icon icon icon-html icon-text-html" title="20-如何在不停机的情况下，安全地更换数据库？_For_group_share.html"><span class="name">20-如何在不停机的情况下，安全地更换数据库？_For_group_share.html</span><span class="size">37383</span><span class="date">2020/11/1 下午7:40:44</span></a></li>
+<li><a href="/learning/后端存储实战课/html/21-%E7%B1%BB%E4%BC%BC%E2%80%9C%E7%82%B9%E5%87%BB%E6%B5%81%E2%80%9D%E8%BF%99%E6%A0%B7%E7%9A%84%E6%B5%B7%E9%87%8F%E6%95%B0%E6%8D%AE%E5%BA%94%E8%AF%A5%E5%A6%82%E4%BD%95%E5%AD%98%E5%82%A8%EF%BC%9F_For_group_share.html" class="icon icon icon-html icon-text-html" title="21-类似“点击流”这样的海量数据应该如何存储？_For_group_share.html"><span class="name">21-类似“点击流”这样的海量数据应该如何存储？_For_group_share.html</span><span class="size">32786</span><span class="date">2020/11/1 下午7:40:46</span></a></li>
+<li><a href="/learning/后端存储实战课/html/22-%E9%9D%A2%E5%AF%B9%E6%B5%B7%E9%87%8F%E6%95%B0%E6%8D%AE%EF%BC%8C%E5%A6%82%E4%BD%95%E6%89%8D%E8%83%BD%E6%9F%A5%E5%BE%97%E6%9B%B4%E5%BF%AB-_For_group_share.html" class="icon icon icon-html icon-text-html" title="22-面对海量数据，如何才能查得更快-_For_group_share.html"><span class="name">22-面对海量数据，如何才能查得更快-_For_group_share.html</span><span class="size">35925</span><span class="date">2020/11/1 下午7:40:46</span></a></li>
+<li><a href="/learning/后端存储实战课/html/23-MySQL%E7%BB%8F%E5%B8%B8%E9%81%87%E5%88%B0%E7%9A%84%E9%AB%98%E5%8F%AF%E7%94%A8%E3%80%81%E5%88%86%E7%89%87%E9%97%AE%E9%A2%98%EF%BC%8CNewSQL%E6%98%AF%E5%A6%82%E4%BD%95%E8%A7%A3%E5%86%B3%E7%9A%84%EF%BC%9F_For_group_share.html" class="icon icon icon-html icon-text-html" title="23-MySQL经常遇到的高可用、分片问题，NewSQL是如何解决的？_For_group_share.html"><span class="name">23-MySQL经常遇到的高可用、分片问题，NewSQL是如何解决的？_For_group_share.html</span><span class="size">36468</span><span class="date">2020/11/1 下午7:40:48</span></a></li>
+<li><a href="/learning/后端存储实战课/html/24-RocksDB%EF%BC%9A%E4%B8%8D%E4%B8%A2%E6%95%B0%E6%8D%AE%E7%9A%84%E9%AB%98%E6%80%A7%E8%83%BDKV%E5%AD%98%E5%82%A8_For_group_share.html" class="icon icon icon-html icon-text-html" title="24-RocksDB：不丢数据的高性能KV存储_For_group_share.html"><span class="name">24-RocksDB：不丢数据的高性能KV存储_For_group_share.html</span><span class="size">34333</span><span class="date">2020/11/1 下午7:40:48</span></a></li>
+<li><a href="/learning/后端存储实战课/html/%E7%AE%80%E4%BB%8B_For_group_share.html" class="icon icon icon-html icon-text-html" title="简介_For_group_share.html"><span class="name">简介_For_group_share.html</span><span class="size">23895</span><span class="date">2020/11/1 下午7:40:51</span></a></li>
+<li><a href="/learning/后端存储实战课/html/%E7%BB%93%E8%AF%BE%E6%B5%8B%E8%AF%95-%E5%90%8E%E7%AB%AF%E5%AD%98%E5%82%A8%EF%BC%8C100%E5%88%86%E8%AF%95%E5%8D%B7%E7%AD%89%E4%BD%A0%E6%9D%A5%E6%8C%91%E6%88%98_For_group_share.html" class="icon icon icon-html icon-text-html" title="结课测试-后端存储，100分试卷等你来挑战_For_group_share.html"><span class="name">结课测试-后端存储，100分试卷等你来挑战_For_group_share.html</span><span class="size">21945</span><span class="date">2020/11/1 下午7:40:52</span></a></li>
+<li><a href="/learning/后端存储实战课/html/%E7%BB%93%E6%9D%9F%E8%AF%AD-%E6%8A%8A%E5%A5%8B%E6%96%97%E5%BD%93%E4%B9%A0%E6%83%AF_For_group_share.html" class="icon icon icon-html icon-text-html" title="结束语-把奋斗当习惯_For_group_share.html"><span class="name">结束语-把奋斗当习惯_For_group_share.html</span><span class="size">41374</span><span class="date">2020/11/1 下午7:40:53</span></a></li>
+<li><a href="/learning/后端存储实战课/html/%E5%BC%80%E7%AF%87%E8%AF%8D-%E4%BB%8E%E4%BB%8A%E5%A4%A9%E8%B5%B7%EF%BC%8C%E6%8D%A2%E7%A7%8D%E6%96%B9%E5%BC%8F%E5%AD%A6%E5%AD%98%E5%82%A8_For_group_share.html" class="icon icon icon-html icon-text-html" title="开篇词-从今天起，换种方式学存储_For_group_share.html"><span class="name">开篇词-从今天起，换种方式学存储_For_group_share.html</span><span class="size">34895</span><span class="date">2020/11/1 下午7:40:49</span></a></li>
+<li><a href="/learning/后端存储实战课/html/%E8%AF%BE%E5%89%8D%E5%8A%A0%E9%A4%90-%E7%94%B5%E5%95%86%E7%B3%BB%E7%BB%9F%E6%98%AF%E5%A6%82%E4%BD%95%E8%AE%BE%E8%AE%A1%E7%9A%84%EF%BC%9F_For_group_share.html" class="icon icon icon-html icon-text-html" title="课前加餐-电商系统是如何设计的？_For_group_share.html"><span class="name">课前加餐-电商系统是如何设计的？_For_group_share.html</span><span class="size">34297</span><span class="date">2020/11/1 下午7:40:54</span></a></li></ul>
+    </div>
+  
+</body></learning/后端存储实战课/html>
